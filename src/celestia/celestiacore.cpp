@@ -185,6 +185,7 @@ View::View(View::Type _type,
 }
 
 //For FMOD
+#ifdef FMOD
 void ERRCHECK(FMOD_RESULT result)
 {
     if (result != FMOD_OK)
@@ -194,6 +195,7 @@ void ERRCHECK(FMOD_RESULT result)
         return;
     }
 }
+#endif // FMOD
 
 void View::mapWindowToView(float wx, float wy, float& vx, float& vy) const
 {
@@ -404,6 +406,7 @@ CelestiaCore::CelestiaCore() :
     console.setWindowHeight(ConsolePageRows);
 
 //Audio support by Victor, modified by Vincent & Alexell
+#ifdef FMOD
 result = FMOD::System_Create(&sysaudio);
 ERRCHECK(result);
 
@@ -419,7 +422,9 @@ if (version < FMOD_VERSION)
 
 result = sysaudio->init(MAX_CHANNELS, FMOD_INIT_NORMAL, 0);
 ERRCHECK(result);
+#endif // FMOD
 }
+
 
 CelestiaCore::~CelestiaCore()
 {
@@ -437,11 +442,12 @@ CelestiaCore::~CelestiaCore()
 #endif
 
     delete execEnv;
-
+#ifdef FMOD
     result = sysaudio->close();
     ERRCHECK(result);
     result = sysaudio->release();
     ERRCHECK(result);
+#endif // FMOD
 }
 
 void CelestiaCore::readFavoritesFile()
@@ -2525,7 +2531,9 @@ void CelestiaCore::tick()
 #endif // CELX
 
     sim->update(dt);
+#ifdef FMOD
     sysaudio->update();
+#endif // FMOD
 }
 
 
@@ -4988,6 +4996,7 @@ void CelestiaCore::forward()
 void CelestiaCore::playSoundFile(int channel, float volume, float pan,
                                  int loop, const string& filename, int nopause)
 {
+#ifdef FMOD
 #ifdef _WIN64
 	//TODO: fix. (seems to crash in 64-bit)
 	return;
@@ -5082,11 +5091,13 @@ void CelestiaCore::playSoundFile(int channel, float volume, float pan,
         pause[channel] = false;
     else
         pause[channel] = true;
+#endif // FMOD
 }
 
 
 void CelestiaCore::stopSounds()
 {
+#ifdef FMOD
 #ifdef _WIN64
     //TODO: fix. (seems to crash in 64-bit)
     return;
@@ -5106,10 +5117,12 @@ void CelestiaCore::stopSounds()
             }
         }
     }
+#endif // FMOD
 }
 
 void CelestiaCore::pauseSounds()
 {
+#ifdef FMOD
 #ifdef _WIN64
 	//TODO: fix. (seems to crash in 64-bit)
 	return;
@@ -5122,6 +5135,7 @@ void CelestiaCore::pauseSounds()
             channels[i]->getPaused(&paused);
             channels[i]->setPaused(!paused);
         }
+#endif // FMOD
 }
 
 const vector<Url*>& CelestiaCore::getHistory() const
